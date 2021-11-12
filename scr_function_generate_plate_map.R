@@ -126,8 +126,9 @@ print.plate.map <- function(d, col, txt = NULL, pdf=F, png=F, file.name=NULL) {
     mtext(1:12, side = 3, at = 1:12, line = 1)
     mtext(paste("Plate", d$plate[1]), side=1, line=1)
     if(!is.null(txt)) text(rep(1:12, each=8), rep(rev(1:8), 12), txt)
-    legend(13,8, pch=19, bg = "white",
-           col=unique(col),
+    legend(13,8, pch=21, bg = "white",
+           col="gray30",
+           pt.bg=unique(col),
            unique(names(col))
            )
     if(i==1 & pdf) dev.off()
