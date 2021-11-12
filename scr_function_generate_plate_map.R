@@ -108,11 +108,30 @@ read.plate.map <- function(file_names, plate_id="1", csv_sep=",", path=".") {
   return(final_tab)
 }
 
-# paf <- "~/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/extraction_PCR/plans_plaques_extraction"
-# file_names <- list.files(paf, pattern = ".csv")
-# plate_id <- gsub("plan_(plate_[0-9]+)\\.csv", "\\1", file_names)
-# 
-# d <- read.plate.map(file_names,plate_id, path=paf)
-# write.table(d, file.path(paf, "total_sample_list_plate_map.csv"), row.names = F)
 
+print.plate.map <- function(d, col, txt = NULL, pdf=F, png=F, file.name=NULL) {
+  if(unique(d$plate) > 1) stop("Only one plate can be printed at a time")
+  if(any(pdf,png) & is.null(file.name)) stop("Please provide a file name.")
   
+  l <- c("A", "B", "C", "D", "E", "F", "G", "H")
+  i <- ifelse(pdf & png, 1, 2)
+  while (i < 3) {
+    if(i==1 & pdf) pdf(paste0(file.name, ".pdf"), 7,5)
+    if(i==2 & png) png(paste0(file.name, ".png"), 7,5, units = "in", res = 300)
+    par(bty="n", xpd=T, las=1, mar=c(2,2,2,8),fg="gray30", col.axis="gray30")
+    plot(rep(1:12, each=8), rep(8:1, 12), axes=F,
+         xlab="", ylab="",
+         pch=21, cex=5, col="darkgray", bg=col)
+    mtext(rev(l), side = 2, at = 1:8, line = 1)
+    mtext(1:12, side = 3, at = 1:12, line = 1)
+    mtext(paste("Plate", d$plate[1]), side=1, line=1)
+    if(!is.null(txt)) text(rep(1:12, each=8), rep(rev(1:8), 12), txt)
+    legend(13,8, pch=19, bg = "white",
+           col=unique(col),
+           unique(names(col))
+           )
+    if(i==1 & pdf) dev.off()
+    if(i==2 & png) dev.off()
+    i <- i + 1
+  }
+}
