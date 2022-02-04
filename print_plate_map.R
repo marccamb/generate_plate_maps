@@ -16,11 +16,15 @@ print.plate.map <- function(d, col, txt = NULL, pdf=F, png=F, file.name=NULL) {
     mtext(1:length(c), side = 3, at = 1:length(c), line = 1)
     mtext(paste("Plate", d$plate[1]), side=1, line=1)
     if(!is.null(txt)) text(rep(1:length(c), each=length(l)), rep(rev(1:length(l)), length(c)), txt)
-    legend(length(c)+0.5,length(l), pch=21, bg = "white",
-           col="gray30",
-           pt.bg=unique(col),
-           unique(names(col))
-    )
+    if(is.null(names(col))) {
+      warning("coul is not a named vector. Automatic legend cannot be plotted")
+    } else {
+      legend(length(c)+0.5,length(l), pch=21, bg = "white",
+             col="gray30",
+             pt.bg=unique(col),
+             unique(names(col))
+      )
+    }
     if(i==1 & pdf) dev.off()
     if(i==2 & png) dev.off()
     i <- i + 1
