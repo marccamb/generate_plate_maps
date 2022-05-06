@@ -36,43 +36,55 @@
 # and the well in the plate for each sample. The second component of the list is a list of the plates maps (each 
 # component of the list is one plate)
 
-generate.plate.map <- function(s, pos_ctrl_PCR = T,
+generate.plate.map <- function(s, n_wells=96,
+                               pos_ctrl_PCR = T,
                                neg_ctrl_PCR = T,
                                pos_ctrl_extract = T,
                                neg_ctrl_extract = T,
                                random_samples = T,
                                set_plate_counter = 1,
 			       set_seed=NULL) {
-  # Names of the 96 wells
-  list_wells <- paste(c('A','B','C','D','E','F','G','H'),sort(rep(1:12,8)),sep="")
-  # Number of controls per plate
-  nb_ctrl_per_plate <- sum(pos_ctrl_PCR, neg_ctrl_PCR, pos_ctrl_extract, neg_ctrl_extract)
-  if(nb_ctrl_per_plate > 0) {
-  # Names of the controls per plate
-    ctrl_names <- rep(c("pos_ctrl_PCR", "neg_ctrl_PCR", "pos_ctrl_extract", "neg_ctrl_extract"), 
-                      c(pos_ctrl_PCR, neg_ctrl_PCR, pos_ctrl_extract, neg_ctrl_extract))
-    # Location of the controls in the plate
-    wells_ctrl <- list_wells[(97-nb_ctrl_per_plate):96]
-  }
+  if(!n_wells %in% c(12,96)) stop("The function only works for 12 or 96 wells for now")
+  
   # Randomize sample order if needed
   if(random_samples) {
-	set.seed(set_seed)
-	s <- sample(s, length(s), replace=F)
+    set.seed(set_seed)
+    s <- sample(s, length(s), replace=F)
   }
   
+  # Names of the wells
+  if(n_wells==96) {
+    list_wells <- paste(c('A','B','C','D','E','F','G','H'),sort(rep(1:12,8)),sep="")
+    # Number of controls per plate
+    nb_ctrl_per_plate <- sum(pos_ctrl_PCR, neg_ctrl_PCR, pos_ctrl_extract, neg_ctrl_extract)
+    if(nb_ctrl_per_plate > 0) {
+      # Names of the controls per plate
+      ctrl_names <- rep(c("pos_ctrl_PCR", "neg_ctrl_PCR", "pos_ctrl_extract", "neg_ctrl_extract"), 
+                        c(pos_ctrl_PCR, neg_ctrl_PCR, pos_ctrl_extract, neg_ctrl_extract))
+      # Location of the controls in the plate
+      wells_ctrl <- list_wells[(97-nb_ctrl_per_plate):96]
+      
+      nb_samples_per_plate <- 96-nb_ctrl_per_plate
+    }
+  } else {
+    list_wells <- paste(c('A','B','C'),sort(rep(1:4,3)),sep="")
+    nb_samples_per_plate <- n_wells
+    nb_ctrl_per_plate <- 0
+  }
+
   # Number of plates needed
-  nb_samples_per_plate <- 96-nb_ctrl_per_plate
   nb_plates <- ceiling(length(s)/nb_samples_per_plate)
   
   
   # Create unique well ids among plates
-  map <- expand.grid(list_wells, paste("plate", seq(set_plate_counter, set_plate_counter-1+nb_plates, 1), sep="_"))
+  map <- expand.grid(list_wells, paste("plate", seq(set_plate_counter, set_plate_counter-1+nb_plates, 1), 
+                                       sep="_"))
   names(map) <- c("well", "plate")
   # Assign a well id controls 
   map$sample <- NA
   if(nb_ctrl_per_plate > 0) map$sample[map$well %in% wells_ctrl] <- rep(ctrl_names, nb_plates)
-  # Assign a well id to samples an set to "empty" remaining wells
-  map$sample[is.na(map$sample)] <- c(s, rep("empty", (96*nb_plates)-(length(s)+nb_ctrl_per_plate*nb_plates)))
+  # Assign a well id to samples and set to "empty" remaining wells
+  map$sample[is.na(map$sample)] <- c(s, rep("empty", (n_wells*nb_plates)-(length(s)+nb_ctrl_per_plate*nb_plates)))
   
   # Generate a more readable map for each plate
   reshaped_map <- lapply(split(map, f = map$plate), function(x) {
