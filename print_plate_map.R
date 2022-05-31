@@ -8,7 +8,7 @@ print.plate.map <- function(d, col, txt = NULL, pdf=F, png=F, file.name=NULL) {
   while (i < 3) {
     if(i==1 & pdf) pdf(paste0(file.name, ".pdf"), 7,5)
     if(i==2 & png) png(paste0(file.name, ".png"), 7,5, units = "in", res = 300)
-    par(bty="n", xpd=T, las=1, mar=c(2,2,2,8),fg="gray30", col.axis="gray30")
+    par(bty="n", xpd=T, las=1, mar=c(4,2,2,8),fg="gray30", col.axis="gray30")
     plot(rep(1:length(c), each=length(l)), rep(length(l):1, length(c)), 
          axes=F, xlab="", ylab="",
          pch=21, cex=ifelse(length(l)==96,5,7), col="darkgray", bg=col)
