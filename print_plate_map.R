@@ -1,4 +1,4 @@
-print.plate.map <- function(d, col, txt = NULL, pdf=F, png=F, file.name=NULL) {
+print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F, file.name=NULL) {
   if(length(unique(d$plate)) > 1) stop("Only one plate can be printed at a time")
   if(any(pdf,png) & is.null(file.name)) stop("Please provide a file name.")
   
@@ -20,7 +20,7 @@ print.plate.map <- function(d, col, txt = NULL, pdf=F, png=F, file.name=NULL) {
       warning("coul is not a named vector. Automatic legend cannot be plotted")
     } else {
       legend(length(c)+0.5,length(l), pch=21, bg = "white",
-             col="gray30",
+             col="gray30",title = legend.title,
              pt.bg=unique(col),
              unique(names(col))
       )
