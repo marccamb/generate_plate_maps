@@ -43,7 +43,7 @@ generate.plate.map <- function(s, n_wells=96,
                                neg_ctrl_extract = T,
                                random_samples = T,
                                set_plate_counter = 1,
-			       set_seed=NULL) {
+                               set_seed=NULL) {
   if(!n_wells %in% c(12,96)) stop("The function only works for 12 or 96 wells for now")
   
   # Randomize sample order if needed
@@ -65,6 +65,8 @@ generate.plate.map <- function(s, n_wells=96,
       wells_ctrl <- list_wells[(97-nb_ctrl_per_plate):96]
       
       nb_samples_per_plate <- 96-nb_ctrl_per_plate
+    } else {
+      nb_samples_per_plate <- n_wells
     }
   } else {
     list_wells <- paste(c('A','B','C'),sort(rep(1:4,3)),sep="")
