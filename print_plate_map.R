@@ -1,5 +1,5 @@
 print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F, file.name=NULL) {
-  if(length(unique(d$plate)) > 1) stop("Only one plate can be printed at a time")
+  if(class(d)=="list") stop("Only one plate can be printed at a time, and d is a list. Please provide a data.frame")
   if(any(pdf,png) & is.null(file.name)) stop("Please provide a file name.")
   
   l <- unique(substr(d$well, 1, 1))
