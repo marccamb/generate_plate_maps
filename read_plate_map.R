@@ -1,3 +1,30 @@
+# Function read.plate.map()
+#
+# 2019-09-04
+# Marine Cambon
+
+#### Description: 
+# Read a set of plate maps in wide format from multiple csv files and turns them into a tidy dataframe.
+
+#### Usage:
+# read.plate.map(file_names, plate_id=NULL, n_wells=96, csv_sep=",", path=".") 
+# random_samples = T)
+
+#### Arguments:
+# file_names         a vector of the plate map files names
+# n_wells            a numerical value indicating the number of wells in the plate
+#                       The only supported values for now are 12 and 96.
+# plate_id           a vector of plate id corresponding to each plate file. If NULL, 
+#                       the plate ids will be number starting at 1.
+# csv_sep            a character corresponding to the text file separator 
+# path               a character with the path to the directory containing all files
+
+#### Details:
+# 
+
+#### Value:
+# Returns a signle dataframe containing the samples from all plates.
+
 read.plate.map <- function(file_names, plate_id=NULL, n_wells=96, csv_sep=",", path=".") {
   if(is.null(plate_id)) plate_id <- seq(1:length(file_names))
   if (length(file_names)==1) {

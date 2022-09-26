@@ -4,7 +4,7 @@
 # Marine Cambon
 
 #### Description: 
-# Generate plates map for extraction/PCR from a list of samples.
+# Generate plates map for extraction/PCR/cell cultures from a list of samples.
 
 #### Usage:
 # generate.plate.map(s, pos_ctrl_PCR = T, neg_ctrl_PCR = T, pos_ctrl_extract = T, neg_ctrl_extract = T, 
@@ -12,6 +12,8 @@
 
 #### Arguments:
 # s                  a vector containing the samples names
+# n_wells            a numerical value indicating the number of wells in the plate
+#                       The only supported values for now are 12 and 96.
 # pos_ctrl_PCR       a logical value indicating whether to add a PCR positive control in each plate,
 #                       or a numerical value indicating the number of controls to put in each plate
 # neg_ctrl_PCR       a logical value indicating whether to add a PCR negative control in each plate
@@ -29,12 +31,12 @@
 #### Details:
 # Positive and negative extraction and/or PCR controls can be added in each plate. 
 # If the total number of samples and controls is not sufficient to completely fill plates, the wells which will
-# remain empty are filled with "empty" (euh bon c'est pas clair ce que je dis mais j'arrive pas à le dire)
+# remain empty are filled with "empty"
 
 #### Value:
-# Returns a list. The firt component of the list is a dataframe with one row per sample, indicating the plate number
+# Returns a list. The first element of the list is a dataframe with one row per sample, indicating the plate number
 # and the well in the plate for each sample. The second component of the list is a list of the plates maps (each 
-# component of the list is one plate)
+# element of the list is one plate)
 
 generate.plate.map <- function(s, n_wells=96,
                                pos_ctrl_PCR = T,
