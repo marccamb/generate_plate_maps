@@ -81,14 +81,13 @@ generate.plate.map <- function(s, n_wells=96,
   
   
   # Create unique well ids among plates
-  map <- expand.grid(list_wells, paste("plate", seq(set_plate_counter, set_plate_counter-1+nb_plates, 1), 
-                                       sep="_"))
+  map <- expand.grid(list_wells, seq(set_plate_counter, set_plate_counter-1+nb_plates, 1))
   names(map) <- c("well", "plate")
   # Assign a well id controls 
-  map$sample <- NA
-  if(nb_ctrl_per_plate > 0) map$sample[map$well %in% wells_ctrl] <- rep(ctrl_names, nb_plates)
+  map$sample_id <- NA
+  if(nb_ctrl_per_plate > 0) map$sample_id[map$well %in% wells_ctrl] <- rep(ctrl_names, nb_plates)
   # Assign a well id to samples and set to "empty" remaining wells
-  map$sample[is.na(map$sample)] <- c(s, rep("empty", (n_wells*nb_plates)-(length(s)+nb_ctrl_per_plate*nb_plates)))
+  map$sample_id[is.na(map$sample_id)] <- c(s, rep("empty", (n_wells*nb_plates)-(length(s)+nb_ctrl_per_plate*nb_plates)))
   
   # Generate a more readable map for each plate
   reshaped_map <- lapply(split(map, f = map$plate), function(x) {
