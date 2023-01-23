@@ -103,5 +103,5 @@ generate.plate.map <- function(s, n_wells=96,
     return(res)
   })
   
-  return(list(map, reshaped_map))
+  return(list(map, reshaped_map[[1]]))
 }
