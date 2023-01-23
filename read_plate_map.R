@@ -43,6 +43,6 @@ read.plate.map <- function(file_names, plate_id=NULL, n_wells=96, csv_sep=",", p
     }
   }
   final_tab <- with(res, data.frame("plate"=plate, "well"=paste(row, time, sep=""), "sample_id"=res$col))
-  message("Done!")
+  #message("Done!")
   return(final_tab)
 }
