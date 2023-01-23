@@ -14,6 +14,7 @@
 # s                  a vector containing the samples names
 # n_wells            a numerical value indicating the number of wells in the plate
 #                       The only supported values for now are 12 and 96.
+# set_all_ctrl       a logical value to set to TRUE or FALSE all ctrl parameters at once
 # pos_ctrl_PCR       a logical value indicating whether to add a PCR positive control in each plate,
 #                       or a numerical value indicating the number of controls to put in each plate
 # neg_ctrl_PCR       a logical value indicating whether to add a PCR negative control in each plate
@@ -39,6 +40,7 @@
 # element of the list is one plate)
 
 generate.plate.map <- function(s, n_wells=96,
+                               set_all_ctrl = NULL,
                                pos_ctrl_PCR = T,
                                neg_ctrl_PCR = T,
                                pos_ctrl_extract = T,
@@ -47,6 +49,9 @@ generate.plate.map <- function(s, n_wells=96,
                                set_plate_counter = 1,
                                set_seed=NULL) {
   if(!n_wells %in% c(12,96)) stop("The function only works for 12 or 96 wells for now")
+  if(!is.null(set_all_ctrl)) pos_ctrl_PCR <- neg_ctrl_PCR <- pos_ctrl_extract <- neg_ctrl_extract <- set_all_ctrl
+  if(n_wells == 12 & any(c(pos_ctrl_PCR,neg_ctrl_PCR,
+                           pos_ctrl_extract,neg_ctrl_extract))) warning("Controls are only supported in 96-well plates for now")
   
   # Randomize sample order if needed
   if(random_samples) {
