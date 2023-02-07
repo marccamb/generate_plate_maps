@@ -1,9 +1,39 @@
+# Function print.plate.map()
+#
+# 2021-03-04
+# Marine Cambon
+
+#### Description: 
+# Print a plate map for visual check and lab notbooks
+
+#### Usage:
+# print.plate.map(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F, file.name=NULL)
+
+#### Arguments:
+# d                  a data frame containing a variable named `well` with the well identity.
+# col                a vector of colors for wells. If provided as a named vector, an automatic legend will be plotted
+# txt                a vector of text to be printed in each well (should be short)
+# legend.title       a character string for the legend title. If NULL, no title is added
+# pdf                a boolean indicating whether to produce a pdf file of the plate map
+# pdf                a boolean indicating whether to produce a png file of the plate map
+# file.name          a the name of the file produced when pdf and/or png are TRUE
+
+#### Details:
+# For a good aspect ratio in Rmarkdown/Quarto document, set the figure dimentions to fig-width: 5 and fig-height: 3
+# for 12-well plates, or fig-width: 10 and fig-height: 6 for 96-well plates
+
+#### Value:
+# Returns a list. The first element of the list is a dataframe with one row per sample, indicating the plate number
+# and the well in the plate for each sample. The second component of the list is a list of the plates maps (each 
+# element of the list is one plate)
+
 print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F, file.name=NULL) {
   if(class(d)=="list") stop("Only one plate can be printed at a time, and d is a list. Please provide a data.frame")
   if(any(pdf,png) & is.null(file.name)) stop("Please provide a file name.")
   
   l <- unique(substr(d$well, 1, 1))
   c <- unique(gsub("[A-Z]", "", d$well))
+  
   i <- ifelse(pdf & png, 1, 2)
   while (i < 3) {
     if(i==1 & pdf) pdf(paste0(file.name, ".pdf"), 7,5)
@@ -14,7 +44,8 @@ print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F,
          pch=21, cex=ifelse(length(l)==96,5,7), col="darkgray", bg=col)
     mtext(rev(l), side = 2, at = 1:8, line = 1)
     mtext(1:length(c), side = 3, at = 1:length(c), line = 1)
-    mtext(paste("Plate", d$plate[1]), side=1, line=1)
+    if(any(grepl("plate", names(d)))) mtext(paste("Plate", d$plate[1]), side=1, line=1)
+    
     if(!is.null(txt)) text(rep(1:length(c), each=length(l)), rep(rev(1:length(l)), length(c)), txt)
     if(is.null(names(col))) {
       warning("coul is not a named vector. Automatic legend cannot be plotted")
