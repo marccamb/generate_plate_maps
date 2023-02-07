@@ -22,10 +22,15 @@
 # For a good aspect ratio in Rmarkdown/Quarto document, set the figure dimentions to fig-width: 5 and fig-height: 3
 # for 12-well plates, or fig-width: 10 and fig-height: 6 for 96-well plates
 
-#### Value:
-# Returns a list. The first element of the list is a dataframe with one row per sample, indicating the plate number
-# and the well in the plate for each sample. The second component of the list is a list of the plates maps (each 
-# element of the list is one plate)
+#### Example:
+
+# well_id <- expand.grid(LETTERS[1:8], 1:12)
+# well_id <- paste0(well_id[,1], well_id[,2])
+# d <- data.frame("well"=well_id,
+#                 "treat"=c("treatment", "control"))
+# colors <- c("treatment"="lightblue", "control"="pink")[d$treat]
+# print.plate.map(d, col = colors, txt=d$well)
+
 
 print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F, file.name=NULL) {
   if(class(d)=="list") stop("Only one plate can be printed at a time, and d is a list. Please provide a data.frame")
