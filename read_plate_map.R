@@ -37,6 +37,8 @@ read.plate.map <- function(file_names, plate_id=NULL, n_wells=96, csv_sep=",", p
     res <- NULL
     for (i in 1:length(file_names)) {
       f <- read.table(file.path(path, file_names[i]), sep=csv_sep, h=T)
+      if(dim(f)[1]*(dim(f)[2]-1)!= n_wells) stop(paste("The file does not contain the appropriate culumn number for", n_wells, "well plates. Please check the field separator csv_sep, or the number of wells n_wells"))
+      if(colnames(f)[1] != "row") stop("The name of the first colum should be \"row\"")
       r <- reshape(f, idvar = "row", varying = names(f)[-1], direction = "long")
       r$plate <- plate_id[i]
       res <- rbind(res, r)
