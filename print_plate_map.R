@@ -32,7 +32,7 @@
 # print.plate.map(d, col = colors, txt=d$well)
 
 
-print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F, file.name=NULL) {
+print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F, file.name=NULL, warnings=T) {
   if(class(d)=="list") stop("Only one plate can be printed at a time, and d is a list. Please provide a data.frame")
   if(any(pdf,png) & is.null(file.name)) stop("Please provide a file name.")
   
@@ -56,13 +56,13 @@ print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F,
     plot(rep(1:length(c), each=length(l)), rep(length(l):1, length(c)), 
          axes=F, xlab="", ylab="",
          pch=21, cex=ifelse(length(l)==96,5,7), col="darkgray", bg=col)
-    mtext(rev(l), side = 2, at = 1:8, line = 1)
-    mtext(1:length(c), side = 3, at = 1:length(c), line = 1)
+    mtext(rev(l), side = 2, at = 1:8, line = 1, font = 2)
+    mtext(1:length(c), side = 3, at = 1:length(c), line = 1, font = 2)
     if(any(grepl("plate", names(d)))) mtext(paste("Plate", d$plate[1]), side=1, line=1)
     
     if(!is.null(txt)) text(rep(1:length(c), each=length(l)), rep(rev(1:length(l)), length(c)), txt)
     if(is.null(names(col))) {
-      warning("coul is not a named vector. Automatic legend cannot be plotted")
+      if(warnings) warning("coul is not a named vector. Automatic legend cannot be plotted")
     } else {
       legend(length(c)+0.5,length(l), pch=21, bg = "white",
              col="gray30",title = legend.title,
