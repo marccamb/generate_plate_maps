@@ -3,7 +3,7 @@
 # 2021-03-04
 # Marine Cambon
 
-#### Description: 
+#### Description:
 # Print a plate map for visual check and lab notbooks
 
 #### Usage:
@@ -32,44 +32,125 @@
 # print.plate.map(d, col = colors, txt=d$well)
 
 
-print.plate.map <- function(d, col, txt = NULL, legend.title=NULL, pdf=F, png=F, file.name=NULL, warnings=T) {
-  if(class(d)=="list") stop("Only one plate can be printed at a time, and d is a list. Please provide a data.frame")
-  if(any(pdf,png) & is.null(file.name)) stop("Please provide a file name.")
+print.plate.map <- function(d,
+                            col,
+                            txt = NULL,
+                            legend.title = NULL,
+                            pdf = F,
+                            png = F,
+                            file.name = NULL,
+                            warnings = T) {
+  if (class(d) == "list")
+    stop("Only one plate can be printed at a time, and d is a list. Please provide a data.frame")
+  if (any(pdf, png) &
+      is.null(file.name))
+    stop("Please provide a file name.")
   
-  l <- unique(substr(d$well, 1, 1))
-  c <- unique(gsub("[A-Z]", "", d$well))
-  if(length(d$well)==96) {
-    wi <- 10
-    he <- 6
+  # Gets letters and numbers from the wells
+  row.letter <- unique(substr(d$well, 1, 1))
+  n.row <- length(row.letter)
+  column.number <- unique(gsub("[A-Z]", "", d$well))
+  n.col <- length(column.number)
+  # Get plot coordinates of the wells
+  coord.x <- gsub("[A-Z]", "", d$well)
+  coord.y <- rev(as.numeric(as.factor(substr(d$well, 1, 1))))
+  
+  # Sets the dimention (width and heigth) parameters for pdf export.
+  if (length(d$well) == 96) {
+    print.wi <- 10
+    print.he <- 6
   } else {
-    wi <- 5
-    he <- 3
+    print.wi <- 5
+    print.he <- 3
   }
   
-  id <- 0 
-  if(pdf) id <- c(id,1)
-  if(png) id <- c(id,2)
+  # Creates a loop if the plate maps needs to be both printed and saved (in up to 2 formats).
+  # If only printing is required, id == 0 and the loops only makes one round
+  id <- 0
+  if (pdf)
+    id <- c(id, 1)
+  if (png)
+    id <- c(id, 2)
+  
   for (i in id) {
-    if(i==1) pdf(paste0(file.name, ".pdf"), wi,he)
-    if(i==2) png(paste0(file.name, ".png"), wi,he, units = "in", res = 300)
-    par(bty="n", xpd=T, las=1, mar=c(4,2,2,8),fg="gray30", col.axis="gray30")
-    plot(rep(1:length(c), each=length(l)), rep(length(l):1, length(c)), 
-         axes=F, xlab="", ylab="",
-         pch=21, cex=ifelse(length(l)==96,5,7), col="darkgray", bg=col)
-    mtext(rev(l), side = 2, at = 1:8, line = 1, font = 2)
-    mtext(1:length(c), side = 3, at = 1:length(c), line = 1, font = 2)
-    if(any(grepl("plate", names(d)))) mtext(paste("Plate", d$plate[1]), side=1, line=1)
+    # Opens connection with files if pdf and/or png outputs
+    if (i == 1)
+      pdf(paste0(file.name, ".pdf"), 
+          print.wi, 
+          print.he)
+    if (i == 2)
+      png(paste0(file.name, ".png"),
+          print.wi,
+          print.he,
+          units = "in",
+          res = 300)
     
-    if(!is.null(txt)) text(rep(1:length(c), each=length(l)), rep(rev(1:length(l)), length(c)), txt)
-    if(is.null(names(col))) {
-      if(warnings) warning("coul is not a named vector. Automatic legend cannot be plotted")
+    # Sets graphical parameters
+    par(
+      bty = "n",
+      xpd = T,
+      las = 1,
+      mar = c(4, 2, 2, 8),
+      fg = "gray30",
+      col.axis = "gray30"
+    )
+    # Creates the plot
+    plot(
+      x = coord.x,
+      y = coord.y,
+      axes = F,
+      xlab = "",
+      ylab = "",
+      pch = 21,
+      cex = ifelse(n.row == 96, 5, 7), # I am not sure about that I might need to change it!
+      col = "darkgray",
+      bg = col
+    )
+    # Adds letters to rows
+    mtext(
+      rev(row.letter),
+      side = 2,
+      at = 1:n.row,
+      line = 1,
+      font = 2
+    )
+    # Adds numbers to columns
+    mtext(
+      column.number,
+      side = 3,
+      at = 1:n.col,
+      line = 1,
+      font = 2
+    )
+    # Prints the plate number if any below the plate
+    if (any(grepl("plate", names(d))))
+      mtext(paste("Plate", d$plate[1]),
+            side = 1,
+            line = 1)
+    
+    # Print the text
+    if (!is.null(txt))
+      text(coord.x, coord.y, txt)
+    
+    # Print the legend if possible
+    if (is.null(names(col))) {
+      if (warnings)
+        warning("coul is not a named vector. Automatic legend cannot be plotted")
     } else {
-      legend(length(c)+0.5,length(l), pch=21, bg = "white",
-             col="gray30",title = legend.title,
-             pt.bg=unique(col),
-             unique(names(col))
+      legend(
+        length(c) + 0.5,
+        length(l),
+        pch = 21,
+        bg = "white",
+        col = "gray30",
+        title = legend.title,
+        pt.bg = unique(col),
+        unique(names(col))
       )
     }
-    if(i!=0) dev.off()
+    
+    # Closes the connection with output files if any
+    if (i != 0)
+      dev.off()
   }
 }
