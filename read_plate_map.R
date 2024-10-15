@@ -18,6 +18,7 @@
 #                       the plate ids will be number starting at 1.
 # csv_sep            a character corresponding to the text file separator 
 # path               a character with the path to the directory containing all files
+# verbose            a boolean for printing additional messages
 
 #### Details:
 # 
@@ -25,7 +26,7 @@
 #### Value:
 # Returns a signle dataframe containing the samples from all plates.
 
-read.plate.map <- function(file_names, plate_id=NULL, n_wells=96, csv_sep=",", path=".") {
+read.plate.map <- function(file_names, plate_id=NULL, n_wells=96, csv_sep=",", path=".", verbose=T) {
   if(is.null(plate_id)) plate_id <- seq(1:length(file_names))
   if (length(file_names)==1) {
     f <- read.table(file.path(path, file_names), sep=csv_sep, h=T)
@@ -33,7 +34,7 @@ read.plate.map <- function(file_names, plate_id=NULL, n_wells=96, csv_sep=",", p
     res <- reshape(f, idvar = "row", varying = names(f)[-1], direction = "long")
     res$plate <- plate_id
   } else {
-    message('Reading plates... Please check that file names and plates IDs are in the same order.')
+    if (verbose) message('Reading plates... Please check that file names and plates IDs are in the same order.')
     res <- NULL
     for (i in 1:length(file_names)) {
       f <- read.table(file.path(path, file_names[i]), sep=csv_sep, h=T)
