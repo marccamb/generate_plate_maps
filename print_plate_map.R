@@ -35,6 +35,7 @@
 print.plate.map <- function(d,
                             col,
                             txt = NULL,
+                            n.well = NULL,
                             legend.title = NULL,
                             pdf = F,
                             png = F,
@@ -46,17 +47,24 @@ print.plate.map <- function(d,
       is.null(file.name))
     stop("Please provide a file name.")
   
+  # Get the number of wells, columns and rows
+  if(is.null(n.well)) n.well <- length(d$well)
+  if(!n.well %in% c(96,24,12)) stop("Please define nb.wells. Possible values are: 96, 24, 12")
+  
+  n.row <- c("96"=8, "24"=4, "12"=3)[as.character(n.well)]
+  n.col <- c("96"=12, "24"=6, "12"=4)[as.character(n.well)]
+     
   # Gets letters and numbers from the wells
-  row.letter <- unique(substr(d$well, 1, 1))
-  n.row <- length(row.letter)
-  column.number <- unique(gsub("[A-Z]", "", d$well))
-  n.col <- length(column.number)
+  row.letter <- LETTERS[1:n.row]
+  column.number <- 1:n.col
+  
   # Get plot coordinates of the wells
-  coord.x <- gsub("[A-Z]", "", d$well)
-  coord.y <- rev(as.numeric(as.factor(substr(d$well, 1, 1))))
+  coord.x <- as.numeric(gsub("[A-Z]", "", d$well))
+  coord.y <- factor(substr(d$well, 1, 1), levels=row.letter) |> 
+    as.numeric()
   
   # Sets the dimention (width and heigth) parameters for pdf export.
-  if (length(d$well) == 96) {
+  if (n.well == 96) {
     print.wi <- 10
     print.he <- 6
   } else {
@@ -96,21 +104,29 @@ print.plate.map <- function(d,
     )
     # Creates the plot
     plot(
-      x = coord.x,
-      y = coord.y,
+      x = rep(1:n.col, n.row),
+      y = -rep(1:n.row, each=n.col),
       axes = F,
       xlab = "",
       ylab = "",
       pch = 21,
-      cex = ifelse(n.row == 96, 5, 7), # I am not sure about that I might need to change it!
+      cex = 7, # ifelse(n.row == 96, 5, 7) I am not sure about that I might need to change it!
+      col = "darkgray",
+      bg = "white"
+    )
+    points(
+      x = coord.x,
+      y = -coord.y,
+      pch = 21,
+      cex = 7, #ifelse(n.row == 96, 5, 7), # I am not sure about that I might need to change it!
       col = "darkgray",
       bg = col
     )
     # Adds letters to rows
     mtext(
-      rev(row.letter),
+      row.letter,
       side = 2,
-      at = 1:n.row,
+      at = -1:-n.row,
       line = 1,
       font = 2
     )
@@ -130,7 +146,7 @@ print.plate.map <- function(d,
     
     # Print the text
     if (!is.null(txt))
-      text(coord.x, coord.y, txt)
+      text(coord.x, -coord.y, txt)
     
     # Print the legend if possible
     if (is.null(names(col))) {
@@ -138,8 +154,8 @@ print.plate.map <- function(d,
         warning("coul is not a named vector. Automatic legend cannot be plotted")
     } else {
       legend(
-        length(c) + 0.5,
-        length(l),
+        n.col + 0.5,
+        -1,
         pch = 21,
         bg = "white",
         col = "gray30",
