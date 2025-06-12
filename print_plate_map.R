@@ -43,6 +43,9 @@ print.plate.map <- function(d,
                             warnings = T) {
   if (class(d) == "list")
     stop("Only one plate can be printed at a time, and d is a list. Please provide a data.frame")
+  if (is.null(d$well))
+    stop("Please provide a dataset with a variable named 'well' containing the name of the well for each sample")
+  
   if (any(pdf, png) &
       is.null(file.name))
     stop("Please provide a file name.")
