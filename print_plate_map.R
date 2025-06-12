@@ -49,7 +49,7 @@ print.plate.map <- function(d,
   
   # Get the number of wells, columns and rows
   if(is.null(n.well)) n.well <- length(d$well)
-  if(!n.well %in% c(96,24,12)) stop("Please define nb.wells. Possible values are: 96, 24, 12")
+  if(!n.well %in% c(96,24,12)) stop("Please define n.wells. Possible values are: 96, 24, 12")
   
   n.row <- c("96"=8, "24"=4, "12"=3)[as.character(n.well)]
   n.col <- c("96"=12, "24"=6, "12"=4)[as.character(n.well)]
