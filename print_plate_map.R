@@ -13,6 +13,8 @@
 # d                  a data frame containing a variable named `well` with the well identity.
 # col                a vector of colors for wells. If provided as a named vector, an automatic legend will be plotted
 # txt                a vector of text to be printed in each well (should be short)
+# n.wells            a numerical value of the number of wells in the plante. If NULL set to nrow(d)
+# coculture          a boolean indicating if the data is a co-culture experiment (typically 36-well plates)
 # legend.title       a character string for the legend title. If NULL, no title is added
 # pdf                a boolean indicating whether to produce a pdf file of the plate map
 # pdf                a boolean indicating whether to produce a png file of the plate map
@@ -33,14 +35,15 @@
 
 
 print.plate.map <- function(d,
-                            col,
-                            txt = NULL,
-                            n.well = NULL,
+                            col="white",
+                            txt = d$sample_id,
+                            n.wells = NULL,
+                            coculture = F,
                             legend.title = NULL,
                             pdf = F,
                             png = F,
                             file.name = NULL,
-                            warnings = T) {
+                            warnings = F) {
   if (class(d) == "list")
     stop("Only one plate can be printed at a time, and d is a list. Please provide a data.frame")
   if (is.null(d$well))
@@ -51,11 +54,11 @@ print.plate.map <- function(d,
     stop("Please provide a file name.")
   
   # Get the number of wells, columns and rows
-  if(is.null(n.well)) n.well <- length(d$well)
-  if(!n.well %in% c(96,24,12)) stop("Please define n.well. Possible values are: 96, 24, 12")
+  if(is.null(n.wells)) n.wells <- length(d$well)
+  if(!n.wells %in% c(96,36,24,12)) stop("Please define n.wells. Possible values are: 96, 36, 24, 12")
   
-  n.row <- c("96"=8, "24"=4, "12"=3)[as.character(n.well)]
-  n.col <- c("96"=12, "24"=6, "12"=4)[as.character(n.well)]
+  n.row <- c("96"=8, "36"=6, "24"=4, "12"=3)[as.character(n.wells)]
+  n.col <- c("96"=12, "36"=6, "24"=6, "12"=4)[as.character(n.wells)]
      
   # Gets letters and numbers from the wells
   row.letter <- LETTERS[1:n.row]
@@ -67,7 +70,7 @@ print.plate.map <- function(d,
     as.numeric()
   
   # Sets the dimention (width and heigth) parameters for pdf export.
-  if (n.well == 96) {
+  if (n.wells == 96) {
     print.wi <- 10
     print.he <- 6
   } else {
@@ -105,23 +108,33 @@ print.plate.map <- function(d,
       fg = "gray30",
       col.axis = "gray30"
     )
-    # Creates the plot
+    # Defines the well positions on the y axis
+    if(!coculture) {
+      y <- -rep(1:n.row, each=n.col)  
+    } else { # for co-culture plates we want co-culture wells to be side by side
+      y <- 1:n.row - c(0,0.2)
+      y <- -rep(y, each=n.col)
+      coord.y <- coord.y - c(0,0.2)
+    }
+    
+    # Creates the plate layout, allows to draw empty wells in case they are absent from the plate map
     plot(
       x = rep(1:n.col, n.row),
-      y = -rep(1:n.row, each=n.col),
+      y = y,
       axes = F,
       xlab = "",
       ylab = "",
       pch = 21,
-      cex = 7, # ifelse(n.row == 96, 5, 7) I am not sure about that I might need to change it!
+      cex = 7, 
       col = "darkgray",
       bg = "white"
     )
+    # Adds the wells with information and color
     points(
       x = coord.x,
       y = -coord.y,
       pch = 21,
-      cex = 7, #ifelse(n.row == 96, 5, 7), # I am not sure about that I might need to change it!
+      cex = 7, 
       col = "darkgray",
       bg = col
     )
@@ -129,7 +142,7 @@ print.plate.map <- function(d,
     mtext(
       row.letter,
       side = 2,
-      at = -1:-n.row,
+      at = unique(y),
       line = 1,
       font = 2
     )
